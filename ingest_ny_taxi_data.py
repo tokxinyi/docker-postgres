@@ -3,10 +3,15 @@ from sqlalchemy import create_engine
 from time import time
 import argparse
 import os
-
+from dotenv import load_dotenv
 
 def main(params):
-    user = os.environ.get('USER')
+
+    # load the environment variables
+    load_dotenv()
+
+    # variables
+    user = os.environ.get('USERNAME')
     password = os.environ.get('PASSWORD')
     host = os.environ.get('HOST')
     port = os.environ.get('PORT')
