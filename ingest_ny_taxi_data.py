@@ -29,18 +29,19 @@ def main(params):
     os.system(f'curl {url} -O {input_filename}')
     df = pd.read_parquet(f'{input_filename}')
 
-
     # convert parquet to csv
-    df.to_csv(f'{output_csv}')
+    df.to_csv(f'{output_csv}', index=False)
 
-    # read the csv file
-    df_csv = pd.read_csv(f'{output_csv}')
+    # replace table if it exists
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
 
     # break the file into chunks for easier ingestion
-    df_csv_iter = pd.read_csv(f'{output_csv}', iterator=True, chunksize=100000)
+    df_csv_iter = pd.read_csv(f'{output_csv}', index_col=0, iterator=True, chunksize=100000)
 
     # ingest the data
     for chunk in df_csv_iter:
+        chunk.tpep_pickup_datetime = pd.to_datetime(chunk.tpep_pickup_datetime)
+        chunk.tpep_dropoff_datetime = pd.to_datetime(chunk.tpep_dropoff_datetime)
         t_start = time()
         chunk.to_sql(name=f'{table_name}', con=engine, schema='public', if_exists='append')
         t_end = time()
