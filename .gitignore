@@ -3,4 +3,3 @@ docker-pg-env/
 ny_taxi_pg_data/
 *.csv
 *.parquet
-docker-postgres.env
